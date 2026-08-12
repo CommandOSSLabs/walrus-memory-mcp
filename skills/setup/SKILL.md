@@ -1,11 +1,11 @@
 ---
 name: setup
-description: Set up Walrus Memory for Claude Code using the bundled MCP server and current delegate-key header authentication. Use when the user asks to connect, install, authenticate, create an account, create a delegate key, log in, verify setup, or troubleshoot Walrus Memory credentials.
+description: Set up Walrus Memory for Claude Code using the published MCP package and current delegate-key authentication. Use when the user asks to connect, install, authenticate, create an account, create a delegate key, log in, verify setup, or troubleshoot Walrus Memory credentials.
 ---
 
 # Walrus Memory Setup
 
-Use this skill to help a Claude Code user finish Walrus Memory setup with the plugin's bundled MCP server.
+Use this skill to help a Claude Code user finish Walrus Memory setup with the published MCP package configured by this plugin.
 
 ## What This Plugin Uses
 
@@ -50,7 +50,7 @@ Credentials are stored locally at `~/.memwal/credentials.json` with file mode `0
 
 ## Troubleshooting
 
-- If the browser flow finishes but Claude Code still says credentials are missing, restart Claude Code so the MCP process reloads.
+- If the browser flow finishes but Claude Code still says credentials are missing, call `memwal_health` again. Current MCP releases reload credentials without a process restart; only restart Claude Code if the server itself is disconnected.
 - If the wallet already has 20 delegate keys, ask the user to open the Walrus Memory dashboard and revoke an unused key.
 - If the user needs a clean login, call `memwal_logout`, then call `memwal_login` again.
 - If recall returns nothing for memories that should exist, call `memwal_restore` with the relevant namespace.

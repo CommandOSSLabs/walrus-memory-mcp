@@ -1,16 +1,12 @@
-# Hosted Claude Custom Connector
+# Hosted Claude custom connector
 
-> **Status: experimental, not production-ready.** The remote MCP OAuth work this
-> connector depends on ([MystenLabs/MemWal#584](https://github.com/MystenLabs/MemWal/pull/584))
-> is still under active security review. Do not present this flow as ready to end
-> users, and do not claim `tools/list` or memory-tool calls have been verified
-> working end to end against the hosted endpoint. Use the local stdio + delegate-key
-> setup (`docs/usage/claude-code.md`, `docs/usage/codex.md`, `docs/usage/other-clients.md`)
-> instead until that PR is merged and the live smoke test is confirmed.
+The hosted Claude custom connector is a separate remote MCP surface that uses OAuth. It does not use this Claude Code plugin's local delegate-key credentials.
 
-This repo is for the local plugin package. The hosted Claude custom connector is a separate remote MCP surface that uses OAuth.
+The OAuth implementation and security review were completed in [MystenLabs/MemWal#584](https://github.com/MystenLabs/MemWal/pull/584). Live Claude testing on the development environment confirmed tool discovery plus representative `memwal_remember` and `memwal_recall` calls.
 
-Once the OAuth work above is accepted, the expected connector URL for Claude's native custom connector UI is:
+## Development endpoint
+
+Use this URL for development testing:
 
 ```text
 https://relayer.dev.memwal.ai/api/mcp
@@ -23,12 +19,16 @@ https://relayer.dev.memwal.ai/.well-known/oauth-authorization-server
 https://relayer.dev.memwal.ai/.well-known/oauth-protected-resource
 ```
 
-Expected flow, once ready:
+Expected flow:
 
-1. Add `https://relayer.dev.memwal.ai/api/mcp` in Claude's connector UI.
-2. Claude discovers OAuth metadata.
+1. Add the MCP URL in Claude's custom connector UI.
+2. Claude discovers the OAuth metadata.
 3. The browser opens the Walrus Memory consent page.
 4. The user connects a wallet and approves access.
-5. Claude can call `tools/list` and memory tools without manual delegate keys or custom headers.
+5. Claude can discover and call the granted memory tools without manual delegate keys or custom headers.
 
-This hosted connector flow is independent of the Claude Code marketplace plugin, which uses local stdio MCP and delegate-key custom-header auth.
+## Production submission
+
+The development endpoint is validated, but the official connector should be submitted only after the merged relayer and app are promoted through staging to production and the same smoke test passes against the production URL.
+
+This hosted connector flow is independent of the Claude Code marketplace plugin, which uses local stdio MCP and the published `@mysten-incubation/memwal-mcp` package.

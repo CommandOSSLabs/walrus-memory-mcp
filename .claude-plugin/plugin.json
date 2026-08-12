@@ -7,7 +7,7 @@
     "name": "Mysten Labs"
   },
   "homepage": "https://memory.walrus.xyz",
-  "repository": "https://github.com/CommandOSSLabs/walrus-memory-mcp",
+  "repository": "https://github.com/CommandOSSLabs/walrus-memory-mcp-plugin",
   "license": "Apache-2.0",
   "keywords": [
     "claude-code",

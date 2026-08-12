@@ -60,8 +60,8 @@ Recall Codex Walrus Memory plugin repo test.
 Clone the plugin repo:
 
 ```bash
-git clone https://github.com/CommandOSSLabs/walrus-memory-mcp.git
-cd walrus-memory-mcp
+git clone https://github.com/CommandOSSLabs/walrus-memory-mcp-plugin.git
+cd walrus-memory-mcp-plugin
 ```
 
 Install hooks and register MCP:
