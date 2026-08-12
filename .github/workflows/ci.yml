@@ -46,3 +46,5 @@ jobs:
           NODE
       - name: Validate with Claude Code
         run: npx -y @anthropic-ai/claude-code plugin validate . --strict
+      - name: Gate marketplace rollout on the canonical MCP release
+        run: node scripts/check_mcp_release.mjs

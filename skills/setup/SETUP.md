@@ -71,7 +71,7 @@ Do not present the development URL as the official production connector. Officia
 ## Troubleshooting
 
 - MCP server missing: restart the client and check the MCP config path.
-- Login completed but tools still fail: call `memwal_health` again. Current MCP releases reload credentials without restarting; restart the client only if the MCP server disconnected.
+- Login completed but tools still fail: restart the client, then call `memwal_health` again. Keep this fallback until the marketplace rollout verifies a published MCP release with live credential reload.
 - No Walrus Memory account: rerun `memwal_login`; the browser flow creates the account and delegate key.
 - Too many delegate keys: revoke an unused key in the Walrus Memory dashboard, then retry setup.
 - Recall returns nothing: run `memwal_restore` for the namespace and retry recall.
