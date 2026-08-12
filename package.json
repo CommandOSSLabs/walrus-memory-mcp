@@ -53,8 +53,11 @@
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/MystenLabs/MemWal.git",
-        "directory": "packages/mcp"
+        "url": "git+https://github.com/CommandOSSLabs/walrus-memory-mcp.git"
+    },
+    "homepage": "https://github.com/CommandOSSLabs/walrus-memory-mcp#readme",
+    "bugs": {
+        "url": "https://github.com/CommandOSSLabs/walrus-memory-mcp/issues"
     },
     "publishConfig": {
         "access": "public",
