@@ -1,6 +1,6 @@
 /**
  * Unit tests for the heuristic signal detectors used by the MemWal lifecycle
- * hooks (../plugin/scripts/lib/signals.mjs). These are pure regex functions —
+ * hooks (../scripts/lib/signals.mjs). These are pure regex functions —
  * cheap to test, and the place a wording tweak is most likely to silently
  * regress the auto-recall / auto-remember behavior the hooks rely on.
  */
@@ -11,7 +11,7 @@ import {
     detectRecall,
     detectRemember,
     detectError,
-} from "../plugin/scripts/lib/signals.mjs";
+} from "../scripts/lib/signals.mjs";
 
 test("detectRecall — fires on references to past work / preferences", () => {
     for (const s of [

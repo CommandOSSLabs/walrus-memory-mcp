@@ -1,4 +1,4 @@
-name: CI
+name: Validate plugin
 
 on:
   pull_request:
@@ -9,15 +9,42 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - run: npm install --package-lock=false
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm pack --dry-run
+      - name: Validate JSON manifests
+        run: |
+          find . -path './.git' -prune -o -name '*.json' -type f -print0 |
+            xargs -0 -n1 node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))'
+      - name: Check hook scripts
+        run: find scripts -name '*.mjs' -print0 | xargs -0 -n1 node --check
+      - name: Test hook signals
+        run: node --test test/*.test.mjs
+      - name: Check plugin package layout
+        run: |
+          test -f .claude-plugin/plugin.json
+          test -f .mcp.json
+          test -f skills/setup/SKILL.md
+          test -f commands/remember.md
+          test -f commands/recall.md
+          test -f hooks/hooks.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const manifest = JSON.parse(fs.readFileSync('.claude-plugin/plugin.json', 'utf8'));
+          for (const path of [manifest.mcpServers, manifest.skills, manifest.commands, manifest.hooks]) {
+            if (!fs.existsSync(path)) throw new Error(`Missing manifest target: ${path}`);
+          }
+          const mcp = JSON.parse(fs.readFileSync('.mcp.json', 'utf8'));
+          const server = mcp.mcpServers?.memwal;
+          if (server?.command !== 'npx' || !server.args?.includes('@mysten-incubation/memwal-mcp')) {
+            throw new Error('Plugin must consume the canonical published MCP package');
+          }
+          NODE
+      - name: Validate with Claude Code
+        run: npx -y @anthropic-ai/claude-code plugin validate . --strict
+      - name: Gate marketplace rollout on the canonical MCP release
+        run: node scripts/check_mcp_release.mjs

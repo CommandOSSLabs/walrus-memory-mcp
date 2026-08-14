@@ -2,7 +2,7 @@
 
 Use this skill when a user asks to connect, test, troubleshoot, or configure Walrus Memory.
 
-This setup path uses local stdio MCP plus delegate-key custom-header auth through `@mysten-incubation/memwal-mcp`. It is separate from the hosted Claude custom-connector OAuth endpoint (see the warning below).
+This setup path uses local stdio MCP plus delegate-key custom-header auth through `@mysten-incubation/memwal-mcp`. It is separate from the hosted Claude custom-connector OAuth endpoint.
 
 ## Fast Path
 
@@ -49,19 +49,11 @@ MCP tools available to Claude Code, Codex, OpenCode, Cursor, Claude Desktop, and
 - Claude Code: `docs/usage/claude-code.md`
 - Codex: `docs/usage/codex.md`
 - OpenCode, Cursor, Claude Desktop: `docs/usage/other-clients.md`
-- Hosted Claude custom connector: `docs/usage/hosted-connector.md` — **experimental, not production-ready, see the warning there**
+- Hosted Claude custom connector: `docs/usage/hosted-connector.md`
 
-## Hosted Connector URL (experimental — do not present as ready)
+## Hosted connector development URL
 
-> **This flow is not yet secure or complete.** The OAuth authorization work behind it
-> ([MystenLabs/MemWal#584](https://github.com/MystenLabs/MemWal/pull/584)) is still under
-> active security review as of this writing. Do not tell a user this path is ready for
-> production use, and do not claim `tools/list` or memory-tool calls have been verified
-> working end to end. If a user asks about the hosted Claude custom connector, point them
-> to the local stdio + delegate-key setup above instead, or explicitly flag this path as
-> experimental/blocked.
-
-For reference, once the OAuth work above is accepted, Claude's native hosted custom connector UI will use:
+The OAuth implementation passed security review and live tool testing on the development environment. Claude's native hosted custom connector UI can use this URL for development testing:
 
 ```text
 https://relayer.dev.memwal.ai/api/mcp
@@ -74,10 +66,12 @@ https://relayer.dev.memwal.ai/.well-known/oauth-authorization-server
 https://relayer.dev.memwal.ai/.well-known/oauth-protected-resource
 ```
 
+Do not present the development URL as the official production connector. Official submission follows production promotion and production smoke testing.
+
 ## Troubleshooting
 
 - MCP server missing: restart the client and check the MCP config path.
-- Login completed but tools still fail: restart the client so the MCP process reloads credentials.
+- Login completed but tools still fail: restart the client, then call `memwal_health` again. Keep this fallback until the marketplace rollout verifies a published MCP release with live credential reload.
 - No Walrus Memory account: rerun `memwal_login`; the browser flow creates the account and delegate key.
 - Too many delegate keys: revoke an unused key in the Walrus Memory dashboard, then retry setup.
 - Recall returns nothing: run `memwal_restore` for the namespace and retry recall.
