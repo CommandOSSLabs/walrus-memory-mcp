@@ -1,6 +1,6 @@
 {
   "name": "memwal",
-  "displayName": "WALRUS MEMORY",
+  "displayName": "Walrus Memory",
   "version": "0.0.7",
   "description": "Walrus Memory for Claude Code: MCP tools, delegate-key setup guidance, slash commands, and lifecycle hooks for durable encrypted memory.",
   "author": {
