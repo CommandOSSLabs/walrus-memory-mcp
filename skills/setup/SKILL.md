@@ -54,4 +54,5 @@ Credentials are stored locally at `~/.memwal/credentials.json` with file mode `0
 - If the wallet already has 20 delegate keys, ask the user to open the Walrus Memory dashboard and revoke an unused key.
 - If the user needs a clean login, call `memwal_logout`, then call `memwal_login` again.
 - If recall returns nothing for memories that should exist, call `memwal_restore` with the relevant namespace.
+- If Claude writes `MEMORY.md` instead of calling `memwal_remember`, the plugin hooks are not loaded. Confirm the plugin is enabled (`/plugin`) and restart Claude Code. MCP-only is not enough for automatic memory.
 
