@@ -1,7 +1,7 @@
 {
   "name": "memwal",
   "displayName": "Walrus Memory",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Walrus Memory for Claude Code: MCP tools, delegate-key setup guidance, slash commands, and lifecycle hooks for durable encrypted memory.",
   "author": {
     "name": "Mysten Labs"
