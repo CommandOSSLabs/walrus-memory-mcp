@@ -1,13 +1,17 @@
 /**
- * UserPromptSubmit hook: recall questions must inject memwal_recall, not
- * memwal_remember. The previous heuristic treated "how I like to work" as a
- * new preference and told the agent to save.
+ * UserPromptSubmit injects one full decision rubric per session, then a
+ * one-line nudge. It must not classify remember vs recall from English
+ * keywords — every substantive prompt in a fresh session gets the same text.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+    DECISION_RUBRIC,
+    DECISION_RUBRIC_NUDGE,
+} from "../scripts/lib/decision-rubric.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const HOOK = resolve(__dirname, "../scripts/on_user_prompt.mjs");
@@ -23,35 +27,41 @@ function runHook(prompt, sessionId = `test-${Math.random().toString(16).slice(2)
     return parsed.hookSpecificOutput?.additionalContext ?? "";
 }
 
-test("recall question injects memwal_recall, not remember", () => {
-    const ctx = runHook(
-        "What do you remember about how I like to work, my coffee order, and my staging canary nickname?",
-    );
-    assert.match(ctx, /memwal_recall/);
-    assert.doesNotMatch(ctx, /memwal_remember/);
+const SUBSTANTIVE = [
+    "What do you remember about how I like to work, my coffee order, and my staging canary nickname?",
+    "A few things about how I work: I always use pnpm, TypeScript strict mode, and my coffee order is a matcha oat latte. My staging canary nickname is coral-fox-77.",
+    "Can you remember that I always use pnpm?",
+    "Tell me what you remember about how I like to work",
+    "Tui luôn dùng pnpm và order cafe là matcha oat latte, nickname review là cedar-wren-11.",
+    "Ban nho cafe order cua toi la gi?",
+    "Remeber that I always use pnpm and my canary is cedar-wren-11.",
+];
+
+test("fresh-session substantive prompts produce byte-identical output", () => {
+    const outputs = SUBSTANTIVE.map((prompt) => runHook(prompt));
+    assert.ok(outputs.length > 1);
+    for (const ctx of outputs) {
+        assert.equal(ctx, outputs[0]);
+        assert.doesNotMatch(ctx, /The user is referencing earlier work/);
+        assert.doesNotMatch(ctx, /The user just stated a durable fact/);
+    }
+    assert.equal(outputs[0], DECISION_RUBRIC);
 });
 
-test("stated preferences inject memwal_remember", () => {
-    const ctx = runHook(
-        "A few things about how I work: I always use pnpm, TypeScript strict mode, and my coffee order is a matcha oat latte. My staging canary nickname is coral-fox-77.",
-    );
-    assert.match(ctx, /memwal_remember/);
-    assert.doesNotMatch(ctx, /memwal_recall/);
+test("later turns in the same session get the one-line nudge", () => {
+    const sessionId = `session-${Math.random().toString(16).slice(2)}`;
+    const first = runHook(SUBSTANTIVE[0], sessionId);
+    const second = runHook(SUBSTANTIVE[1], sessionId);
+    assert.equal(first, DECISION_RUBRIC);
+    assert.equal(second, DECISION_RUBRIC_NUDGE);
 });
 
-test("explicit save request is remember, not recall-only", () => {
-    const ctx = runHook("Can you remember that I always use pnpm?");
-    assert.match(ctx, /memwal_remember/);
-    assert.doesNotMatch(ctx, /memwal_recall/);
+test("terse Vietnamese preference is not skipped", () => {
+    const ctx = runHook("Tui thích pnpm");
+    assert.equal(ctx, DECISION_RUBRIC);
 });
 
-test("what's my X is recall", () => {
-    const ctx = runHook("What's my staging canary nickname?");
-    assert.match(ctx, /memwal_recall/);
-    assert.doesNotMatch(ctx, /memwal_remember/);
-});
-
-test("tell me what you remember is recall even without a question mark", () => {
-    const ctx = runHook("Tell me what you remember about how I like to work");
-    assert.match(ctx, /memwal_recall/);
+test("short prompts stay quiet", () => {
+    assert.equal(runHook("ok"), "");
+    assert.equal(runHook("yes"), "");
 });
